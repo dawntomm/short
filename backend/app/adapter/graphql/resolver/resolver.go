@@ -18,6 +18,7 @@ type Resolver struct {
 func NewResolver(
 	logger fw.Logger,
 	tracer fw.Tracer,
+	urlModifier url.Modifier,
 	urlRetriever url.Retriever,
 	urlCreator url.Creator,
 	requesterVerifier requester.Verifier,
@@ -29,6 +30,7 @@ func NewResolver(
 			logger,
 			tracer,
 			urlCreator,
+			urlModifier,
 			requesterVerifier,
 			authenticator,
 		),

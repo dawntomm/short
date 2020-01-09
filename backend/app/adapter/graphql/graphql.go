@@ -30,6 +30,7 @@ func (t Short) GetResolver() interface{} {
 func NewShort(
 	logger fw.Logger,
 	tracer fw.Tracer,
+	urlModifier url.Modifier,
 	urlRetriever url.Retriever,
 	urlCreator url.Creator,
 	requesterVerifier requester.Verifier,
@@ -38,6 +39,7 @@ func NewShort(
 	r := resolver.NewResolver(
 		logger,
 		tracer,
+		urlModifier,
 		urlRetriever,
 		urlCreator,
 		requesterVerifier,

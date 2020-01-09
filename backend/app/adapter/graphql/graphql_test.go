@@ -34,6 +34,11 @@ func TestGraphQlAPI(t *testing.T) {
 		longLinkValidator,
 		customAliasValidator,
 	)
+	modifier := url.NewModifierPersist(
+		urlRepo,
+		urlRelationRepo,
+		customAliasValidator,
+	)
 
 	s := service.NewReCaptchaFake(service.VerifyResponse{})
 	verifier := requester.NewVerifier(s)
@@ -41,6 +46,6 @@ func TestGraphQlAPI(t *testing.T) {
 
 	logger := mdtest.NewLoggerFake()
 	tracer := mdtest.NewTracerFake()
-	graphqlAPI := NewShort(&logger, &tracer, retriever, creator, verifier, authenticator)
+	graphqlAPI := NewShort(&logger, &tracer, modifier, retriever, creator, verifier, authenticator)
 	mdtest.Equal(t, true, mdtest.IsGraphQlAPIValid(graphqlAPI))
 }

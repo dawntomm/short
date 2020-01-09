@@ -37,8 +37,8 @@ func (u *URLFake) Update(url entity.URL) error {
 	if err != nil {
 		return err
 	}
-	if !isExist {
-		return errors.New("alias do not exist")
+	if isExist {
+		return errors.New("alias exists")
 	}
 	u.urls[url.Alias] = url
 	return nil

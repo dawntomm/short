@@ -10,7 +10,7 @@ var _ Modifier = (*ModifierPersist)(nil)
 
 // Modifier represents URL modifier
 type Modifier interface {
-	UpdateURL(oldAlias string, newAlias string, user entity.User) (entity.URL, error)
+	UpdateURL(oldAlias *string, newAlias *string, user entity.User) (entity.URL, error)
 }
 
 // ModifierPersist represents URL modifier that modifies URL from persistent
@@ -21,21 +21,25 @@ type ModifierPersist struct {
 	aliasValidator      validator.CustomAlias
 }
 
-// UpdateURL update URL matching oldAlias with newAlias
-func (r ModifierPersist) UpdateURL(oldAlias string, newAlias string, user entity.User) (entity.URL, error) {
-	url, err := r.getURL(oldAlias)
+// UpdateURL updates URL matching oldAlias with newAlias
+func (m ModifierPersist) UpdateURL(oldAlias *string, newAlias *string, user entity.User) (entity.URL, error) {
+	url, err := m.getURL(*oldAlias)
 	if err != nil {
 		return entity.URL{}, err
 	}
 
-	url.Alias = newAlias
+	if !m.aliasValidator.IsValid(newAlias) {
+		return entity.URL{}, ErrInvalidCustomAlias(*newAlias)
+	}
 
-	err = r.urlRepo.Update(url)
+	url.Alias = *newAlias
+
+	err = m.urlRepo.Update(url)
 	if err != nil {
 		return entity.URL{}, err
 	}
 
-	err = r.userURLRelationRepo.UpdateRelation(user, url)
+	err = m.userURLRelationRepo.UpdateRelation(user, url)
 	if err != nil {
 		return entity.URL{}, err
 	}
@@ -43,8 +47,8 @@ func (r ModifierPersist) UpdateURL(oldAlias string, newAlias string, user entity
 	return url, nil
 }
 
-func (r ModifierPersist) getURL(alias string) (entity.URL, error) {
-	url, err := r.urlRepo.GetByAlias(alias)
+func (m ModifierPersist) getURL(alias string) (entity.URL, error) {
+	url, err := m.urlRepo.GetByAlias(alias)
 	if err != nil {
 		return entity.URL{}, err
 	}

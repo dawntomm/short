@@ -25,8 +25,8 @@ func (u *UserURLRelationFake) CreateRelation(user entity.User, url entity.URL) e
 
 // UpdateRelation updates many to many relationship between User and URL.
 func (u *UserURLRelationFake) UpdateRelation(user entity.User, url entity.URL) error {
-	if !u.IsRelationExist(user, url) {
-		return errors.New("no relationship exists")
+	if u.IsRelationExist(user, url) {
+		return errors.New("relationship exists")
 	}
 
 	// get index for user in the slice

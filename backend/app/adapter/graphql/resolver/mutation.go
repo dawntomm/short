@@ -13,6 +13,7 @@ type Mutation struct {
 	logger            fw.Logger
 	tracer            fw.Tracer
 	urlCreator        url.Creator
+	urlModifier       url.Modifier
 	requesterVerifier requester.Verifier
 	authenticator     auth.Authenticator
 }
@@ -47,6 +48,7 @@ func newMutation(
 	logger fw.Logger,
 	tracer fw.Tracer,
 	urlCreator url.Creator,
+	urlModifier url.Modifier,
 	requesterVerifier requester.Verifier,
 	authenticator auth.Authenticator,
 ) Mutation {
@@ -54,6 +56,7 @@ func newMutation(
 		logger:            logger,
 		tracer:            tracer,
 		urlCreator:        urlCreator,
+		urlModifier:       urlModifier,
 		requesterVerifier: requesterVerifier,
 		authenticator:     authenticator,
 	}
