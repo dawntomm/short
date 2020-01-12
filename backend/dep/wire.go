@@ -114,6 +114,7 @@ func InjectGraphQlService(
 ) (mdservice.Service, error) {
 	wire.Build(
 		wire.Bind(new(fw.GraphQlAPI), new(graphql.Short)),
+		wire.Bind(new(url.Modifier), new(url.ModifierPersist)),
 		wire.Bind(new(url.Retriever), new(url.RetrieverPersist)),
 		wire.Bind(new(url.Creator), new(url.CreatorPersist)),
 		wire.Bind(new(repository.UserURLRelation), new(db.UserURLRelationSQL)),
@@ -136,6 +137,7 @@ func InjectGraphQlService(
 		provider.NewRemote,
 		validator.NewLongLink,
 		validator.NewCustomAlias,
+		url.NewModifierPersist,
 		url.NewRetrieverPersist,
 		url.NewCreatorPersist,
 		provider.NewKgsRPC,

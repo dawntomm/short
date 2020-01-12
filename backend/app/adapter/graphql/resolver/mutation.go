@@ -40,7 +40,7 @@ func (m Mutation) AuthMutation(args *AuthMutationArgs) (*AuthMutation, error) {
 		return nil, err
 	}
 
-	authMutation := newAuthMutation(user, m.urlCreator)
+	authMutation := newAuthMutation(user, m.urlCreator, m.urlModifier)
 	return &authMutation, nil
 }
 

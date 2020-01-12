@@ -56,7 +56,6 @@ export class UrlService {
         uri: `${this.envService.getVal('GRAPHQL_API_BASE_URL')}/graphql`
       })
     ]);
-
     this.gqlClient = new ApolloClient({
       link: gqlLink,
       cache: new InMemoryCache()

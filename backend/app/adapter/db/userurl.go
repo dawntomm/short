@@ -36,16 +36,15 @@ VALUES ($1,$2)
 // updated url in user_url_relation table.
 func (u UserURLRelationSQL) UpdateRelation(user entity.User, url entity.URL) error {
 	statement := fmt.Sprintf(`
-UPDATE "%s" 
-SET "%s" = $1,
-WHERE "%s" = $2
+INSERT INTO "%s" ("%s","%s")
+VALUES ($1,$2)
 `,
 		table.UserURLRelation.TableName,
-		table.UserURLRelation.ColumnURLAlias,
 		table.UserURLRelation.ColumnUserEmail,
+		table.UserURLRelation.ColumnURLAlias,
 	)
 
-	_, err := u.db.Exec(statement, url.Alias, user.Email)
+	_, err := u.db.Exec(statement, user.Email, url.Alias)
 	return err
 }
 

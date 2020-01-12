@@ -20,6 +20,7 @@ type AuthQuery {
 
 type AuthMutation {
 	createURL(url: URLInput!, isPublic: Boolean!): URL
+	modifyURL(oldAlias: String!, newAlias: String!): URL
 }
 
 input URLInput {

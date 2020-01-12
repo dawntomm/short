@@ -7,18 +7,6 @@ package dep
 
 import (
 	"database/sql"
-	"short/app/adapter/db"
-	"short/app/adapter/facebook"
-	"short/app/adapter/github"
-	"short/app/adapter/google"
-	"short/app/adapter/graphql"
-	"short/app/usecase/account"
-	"short/app/usecase/requester"
-	"short/app/usecase/url"
-	"short/app/usecase/validator"
-	"short/dep/provider"
-	"time"
-
 	"github.com/byliuyang/app/fw"
 	"github.com/byliuyang/app/modern/mdcli"
 	"github.com/byliuyang/app/modern/mddb"
@@ -31,6 +19,17 @@ import (
 	"github.com/byliuyang/app/modern/mdtimer"
 	"github.com/byliuyang/app/modern/mdtracer"
 	"github.com/google/wire"
+	"short/app/adapter/db"
+	"short/app/adapter/facebook"
+	"short/app/adapter/github"
+	"short/app/adapter/google"
+	"short/app/adapter/graphql"
+	"short/app/usecase/account"
+	"short/app/usecase/requester"
+	"short/app/usecase/url"
+	"short/app/usecase/validator"
+	"short/dep/provider"
+	"time"
 )
 
 // Injectors from wire.go:
@@ -59,8 +58,10 @@ func InjectGraphQlService(name string, sqlDB *sql.DB, graphqlPath provider.Graph
 	logger := mdlogger.NewLocal()
 	tracer := mdtracer.NewLocal()
 	urlSql := db.NewURLSql(sqlDB)
-	retrieverPersist := url.NewRetrieverPersist(urlSql)
 	userURLRelationSQL := db.NewUserURLRelationSQL(sqlDB)
+	customAlias := validator.NewCustomAlias()
+	modifierPersist := url.NewModifierPersist(urlSql, userURLRelationSQL, customAlias)
+	retrieverPersist := url.NewRetrieverPersist(urlSql)
 	rpc, err := provider.NewKgsRPC(kgsRPCConfig)
 	if err != nil {
 		return mdservice.Service{}, err
@@ -70,7 +71,6 @@ func InjectGraphQlService(name string, sqlDB *sql.DB, graphqlPath provider.Graph
 		return mdservice.Service{}, err
 	}
 	longLink := validator.NewLongLink()
-	customAlias := validator.NewCustomAlias()
 	creatorPersist := url.NewCreatorPersist(urlSql, userURLRelationSQL, remote, longLink, customAlias)
 	client := mdhttp.NewClient()
 	http := mdrequest.NewHTTP(client)
@@ -80,7 +80,7 @@ func InjectGraphQlService(name string, sqlDB *sql.DB, graphqlPath provider.Graph
 	timer := mdtimer.NewTimer()
 	tokenValidDuration := _wireTokenValidDurationValue
 	authenticator := provider.NewAuthenticator(cryptoTokenizer, timer, tokenValidDuration)
-	short := graphql.NewShort(logger, tracer, retrieverPersist, creatorPersist, verifier, authenticator)
+	short := graphql.NewShort(logger, tracer, modifierPersist, retrieverPersist, creatorPersist, verifier, authenticator)
 	server := provider.NewGraphGophers(graphqlPath, logger, tracer, short)
 	service := mdservice.New(name, server, logger)
 	return service, nil

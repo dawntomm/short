@@ -23,6 +23,15 @@ type ModifierPersist struct {
 
 // UpdateURL updates URL matching oldAlias with newAlias
 func (m ModifierPersist) UpdateURL(oldAlias *string, newAlias *string, user entity.User) (entity.URL, error) {
+	isExist, err := m.urlRepo.IsAliasExist(*newAlias)
+	if err != nil {
+		return entity.URL{}, err
+	}
+
+	if isExist {
+		return entity.URL{}, ErrAliasExist("url alias already exist")
+	}
+
 	url, err := m.getURL(*oldAlias)
 	if err != nil {
 		return entity.URL{}, err
