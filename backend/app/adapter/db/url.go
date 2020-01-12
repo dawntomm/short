@@ -3,10 +3,9 @@ package db
 import (
 	"database/sql"
 	"fmt"
-
-	"github.com/short-d/short/app/adapter/db/table"
-	"github.com/short-d/short/app/entity"
-	"github.com/short-d/short/app/usecase/repository"
+	"short/app/adapter/db/table"
+	"short/app/entity"
+	"short/app/usecase/repository"
 )
 
 var _ repository.URL = (*URLSql)(nil)
@@ -39,6 +38,29 @@ WHERE "%s"=$1;`,
 
 // Create inserts a new URL into url table.
 func (u *URLSql) Create(url entity.URL) error {
+	statement := fmt.Sprintf(`
+INSERT INTO "%s" ("%s","%s","%s","%s","%s")
+VALUES ($1, $2, $3, $4, $5);`,
+		table.URL.TableName,
+		table.URL.ColumnAlias,
+		table.URL.ColumnOriginalURL,
+		table.URL.ColumnExpireAt,
+		table.URL.ColumnCreatedAt,
+		table.URL.ColumnUpdatedAt,
+	)
+	_, err := u.db.Exec(
+		statement,
+		url.Alias,
+		url.OriginalURL,
+		url.ExpireAt,
+		url.CreatedAt,
+		url.UpdatedAt,
+	)
+	return err
+}
+
+// Update updates an old URL with new alias in url table.
+func (u *URLSql) Update(url entity.URL) error {
 	statement := fmt.Sprintf(`
 INSERT INTO "%s" ("%s","%s","%s","%s","%s")
 VALUES ($1, $2, $3, $4, $5);`,
